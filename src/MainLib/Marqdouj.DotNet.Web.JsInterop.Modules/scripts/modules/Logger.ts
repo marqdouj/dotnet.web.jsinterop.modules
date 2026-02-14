@@ -13,14 +13,14 @@ export class Logger {
 
     setLogLevel(level: LogLevel) {
         this.#logLevel = level ?? LogLevel.Information;
-        this.logMessage(LogLevel.Information, `LogLevel has been set to: '${Logger.#logLevelName(this.#logLevel)}'`);
+        this.logMessage(LogLevel.Information, `LogLevel has been set to: '${LoggerHelper.logLevelName(this.#logLevel)}'`);
     }
 
     logMessage(level: LogLevel, message: string, ...optionalParams: any[]): void {
         if (level < this.#logLevel)
             return;
 
-        const logOutput = `[${Logger.#logLevelName(level)}] ${message}`;
+        const logOutput = `[${LoggerHelper.logLevelName(level)}] ${message}`;
 
         switch (level) {
             case LogLevel.Trace:
@@ -43,8 +43,10 @@ export class Logger {
                 break;
         }
     }
+}
 
-    static #logLevelName(level: LogLevel): string {
+export class LoggerHelper {
+    static logLevelName(level: LogLevel): string {
         switch (level) {
             case LogLevel.Critical:
                 return "Critical";

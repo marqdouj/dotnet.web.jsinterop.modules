@@ -1,0 +1,113 @@
+﻿@page "/jslogger"
+@using Marqdouj.DotNet.Web.JsInterop.Modules.Logger
+@rendermode InteractiveServer
+@implements IAsyncDisposable
+@inject IJSRuntime JSRuntime
+@inject ILogger<JsLoggerDemo> Logger
+
+<PageTitle>JSLogger</PageTitle>
+
+<FluentLayout>
+    <FluentHeader>JSLogger</FluentHeader>
+
+    <FluentCard>
+        <FluentLabel Typo="Typography.Subject">Logger Module</FluentLabel>
+        <FluentToolbar>
+            <FluentButton @onclick="(() => TestLogger())">Test All</FluentButton>
+            <FluentSpacer />
+            <FluentButton @onclick="(() => TestRaw())">Test Raw</FluentButton>
+            <FluentButton @onclick="(() => TestScope())">Test Scope</FluentButton>
+            <FluentSpacer />
+            <FluentButton @onclick="(() => TestLogger(LogLevel.Trace))">Trace</FluentButton>
+            <FluentButton @onclick="(() => TestLogger(LogLevel.Debug))">Debug</FluentButton>
+            <FluentButton @onclick="(() => TestLogger(LogLevel.Information))">Information</FluentButton>
+            <FluentButton @onclick="(() => TestLogger(LogLevel.Warning))">Warning</FluentButton>
+            <FluentButton @onclick="(() => TestLogger(LogLevel.Error))">Error</FluentButton>
+            <FluentButton @onclick="(() => TestLogger(LogLevel.Critical))">Critical</FluentButton>
+        </FluentToolbar>
+    </FluentCard>
+</FluentLayout>
+
+@code {
+    private JSLoggerInterop? logger;
+    private JSLoggerInterop LoggerService => logger!;
+
+    protected override void OnInitialized()
+    {
+        logger = new(JSRuntime);
+        logger.Config.SetLevel(LogLevel.Trace, LogLevel.Critical);
+    }
+
+    private async Task TestRaw()
+    {
+        await LoggerService.LogRaw("Test 'Raw' from Module", "color: orange; font-size: 20px;");
+    }
+
+    private async Task TestScope()
+    {
+        using (var scope = LoggerService.BeginScope("TestScope"))
+        {
+            var t = DateTime.Now.ToShortTimeString();
+            await LoggerService.LogInformation($"'Test Scope 1 of 3' from LoggerService : {t}");
+            await LoggerService.LogInformation($"'Test Scope 2 of 3' from LoggerService : {t}");
+            await LoggerService.LogInformation($"'Test Scope 3 of 3' from LoggerService : {t}");
+        }
+    }
+
+    private async Task TestLogger()
+    {
+        await LoggerService.LogRaw("Test 'Raw' from Module", "color: orange; font-size: 20px;");
+        await LoggerService.Test("Test All from Module");
+    }
+
+    private async Task TestLogger(LogLevel level)
+    {
+        var eventName = $"TestLogger-LoggerService";
+
+        switch (level)
+        {
+            case LogLevel.Trace:
+                await LoggerService.LogTrace("Trace message from logger demo page.", eventName);
+                break;
+            case LogLevel.Debug:
+                await LoggerService.LogDebug("Debug message from logger demo page.", eventName);
+                break;
+            case LogLevel.Information:
+                await LoggerService.LogInformation("Information message from logger demo page.", eventName);
+                break;
+            case LogLevel.Warning:
+                await LoggerService.LogWarning("Warning message from logger demo page.", eventName);
+                break;
+            case LogLevel.Error:
+                await LoggerService.LogError("Error message from logger demo page.", eventName);
+                try
+                {
+                    throw new Exception("try/catch Exception from logger demo page.");
+                }
+                catch (Exception ex)
+                {
+                    await LoggerService.LogError(ex, eventName);
+                }
+
+                break;
+            case LogLevel.Critical:
+                await LoggerService.LogCritical("Critical message from logger demo page.", eventName);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            if (logger is not null)
+                await logger!.DisposeAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+        }
+    }
+}

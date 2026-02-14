@@ -4,6 +4,7 @@ module.exports = {
     mode: 'production',
     entry: {
         geolocation: "./tsgen/Geolocation.js",
+        jslogger: "./tsgen/JsLogger.js",
         observer: "./tsgen/Observer.js",
     },
     output: {

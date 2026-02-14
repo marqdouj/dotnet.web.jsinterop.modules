@@ -11,9 +11,14 @@ A demo of this library, and some of my other `DotNet` libraries, can be found [h
 ## Modules
 - `GeolocationInterop`.
   - JSInterop Module that works with the [Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation).
+- `JsLoggerInterop`.
+  - JSInterop Module that logs messages to the browser console.
 - `ObserverInterop`.
   - JSInterop Module that works with the [ResizeObserver API](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserverSize).
 
 ## Release Notes
+- `10.1.0`
+  - `JsLoggerInterop/JSLoggerInterop<T>`. New modules.
+
 - `10.0.0`
   - Initial release.

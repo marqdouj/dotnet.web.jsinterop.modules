@@ -5,6 +5,7 @@ namespace Marqdouj.DotNet.Web.JsInterop.Modules
     internal enum JsModule
     {
         Geolocation,
+        JsLogger,
         Observer,
     }
 
