@@ -6,7 +6,7 @@ I find useful in my [Blazor](https://learn.microsoft.com/en-us/aspnet/core/blazo
 These modules are self-contained (script is loaded/unloaded dynamically; no need to add scripts to App.Razor).
 
 ## Demo
-A demo of this library, and some of my other `DotNet` libraries, can be found [here](https://github.com/marqdouj/dotnet.demo).
+See the 'Sandbox' project in the source code.
 
 ## Modules
 - `GeolocationInterop`.
