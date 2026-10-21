@@ -108,8 +108,8 @@ export class JsLogger {
 
 export class JsLoggerConfig {
     #category: string;
-    #minLevel: LogLevel;
-    #maxLevel: LogLevel;
+    #minLevel: LogLevel = LogLevel.Information;
+    #maxLevel: LogLevel = LogLevel.Critical;
     #template: string;
 
     constructor(category: string, minLevel = LogLevel.Information, maxLevel = LogLevel.Critical, template: string = "") {

@@ -19,7 +19,7 @@ export class Geolocation {
             }
         });
         await getCurrentPositionPromise.then(
-            (position: GeolocationPosition) => { result.position = position; }
+            (position: unknown) => { result.position = position; }
         ).catch(
             (error: any) => {
                 result.error = { code: error.code, message: error.message };
@@ -30,8 +30,8 @@ export class Geolocation {
     }
 
     //https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/watchPosition
-    static async watchPosition(dotNetRef: any, key: string, options?: PositionOptions, callbackMethod?: string): Promise<number> {
-        if (!navigator.geolocation) return null;
+    static async watchPosition(dotNetRef: any, key: string, options?: PositionOptions, callbackMethod?: string): Promise<number | undefined>  {
+        if (!navigator.geolocation) return undefined;
 
         if (Geolocation.isWatched(key)) {
             return;
@@ -68,7 +68,7 @@ export class Geolocation {
 
         if (Geolocation.#watchIDs.has(key)) {
             const id = Geolocation.#watchIDs.get(key);
-            navigator.geolocation.clearWatch(id);
+            navigator.geolocation.clearWatch(id as any);
             Geolocation.#watchIDs.delete(key);
         }
         else

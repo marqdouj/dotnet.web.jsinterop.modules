@@ -6,8 +6,10 @@
     "sourceMap": false,
     "lib": [ "ESNext", "DOM" ],
     "outDir": "tsgen",
+    "rootDir": "scripts/modules",
     "target": "esnext",
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "typeRoots": [ "node_modules/@types" ]
   },
   "include": [ "scripts/**/*" ],
   "compileOnSave": true,
