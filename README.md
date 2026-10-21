@@ -17,7 +17,7 @@ See the 'Sandbox' project in the source code.
   - JSInterop Module that works with the [ResizeObserver API](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserverSize).
 
 ## Release Notes
-- `10.2.0`
+- `10.2.1`
   - Internal updates to Nuget/NPM packages.
   - Sandbox: Update to latest Fluent UI.
 
