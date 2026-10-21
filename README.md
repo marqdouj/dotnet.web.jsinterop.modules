@@ -17,6 +17,10 @@ A demo of this library, and some of my other `DotNet` libraries, can be found [h
   - JSInterop Module that works with the [ResizeObserver API](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserverSize).
 
 ## Release Notes
+- `10.2.0`
+  - Internal updates to Nuget/NPM packages.
+  - Sandbox: Update to latest Fluent UI.
+
 - `10.1.0`
   - `JsLoggerInterop/JSLoggerInterop<T>`. New modules.
 
