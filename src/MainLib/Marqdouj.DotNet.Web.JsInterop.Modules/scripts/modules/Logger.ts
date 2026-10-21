@@ -46,7 +46,7 @@ export class Logger {
 }
 
 export class LoggerHelper {
-    static logLevelName(level: LogLevel): string {
+    static logLevelName(level: LogLevel): string | undefined {
         switch (level) {
             case LogLevel.Critical:
                 return "Critical";

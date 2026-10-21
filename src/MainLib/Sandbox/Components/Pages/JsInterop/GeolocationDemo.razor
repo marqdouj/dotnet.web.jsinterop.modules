@@ -2,37 +2,45 @@
 @using Marqdouj.DotNet.Web.JsInterop.Modules.Geolocation
 @rendermode InteractiveServer
 @implements IAsyncDisposable
-@inject IToastService ToastService
+@inject INotificationService ToastService
 @inject ILogger<GeolocationDemo> Logger
 @inject IJSRuntime JSRuntime
 
-<PageTitle>Geolocation</PageTitle>
+<DemoPage Title="@title">
+    <SummaryContent>
+        <FluentText As="TextTag.Paragraph">
+            This page demonstrates how a user's location can be queried directly, or watched.
+        </FluentText>
+    </SummaryContent>
 
-<FluentLayout>
-    <FluentHeader>Geolocation</FluentHeader>
+    <ChildContent>
+        <Toolbar>
+            <FluentButton Disabled="@disabledGetLocation" IconStart="@(new Icons.Regular.Size20.GlobeSearch())" Title="Get Current Location" OnClick="@GetCurrentPosition" />
+            <FluentSpacer Width="3" />
+            <FluentButton Disabled="@disabledWatching" IconStart="@(new Icons.Regular.Size20.EyeTracking())" Title="Start Watch" OnClick="@(() => GeolocationWatchAsync(true))" />
+            <FluentButton Disabled="@disabledNotWatching" IconStart="@(new Icons.Regular.Size20.EyeTrackingOff())" Title="Stop Watch" OnClick="@(() => GeolocationWatchAsync(false))" />
+            <FluentButton Disabled="@disabled" IconStart="@(new Icons.Regular.Size20.Info())" Title="Check Watch" OnClick="@IsWatched" />
+        </Toolbar>
 
-    <FluentToolbar>
-        <FluentButton Disabled="@disabledGetLocation" IconStart="@(new Icons.Regular.Size20.GlobeSearch())" Title="Get Current Location" OnClick="@GetCurrentPosition" />
-        <FluentSpacer Width="3" />
-        <FluentButton Disabled="@disabledWatching" IconStart="@(new Icons.Regular.Size20.EyeTracking())" Title="Start Watch" OnClick="@(() => GeolocationWatch(true))" />
-        <FluentButton Disabled="@disabledNotWatching" IconStart="@(new Icons.Regular.Size20.EyeTrackingOff())" Title="Stop Watch" OnClick="@(() => GeolocationWatch(false))" />
-        <FluentButton Disabled="@disabled" IconStart="@(new Icons.Regular.Size20.Info())" Title="Check Watch" OnClick="@IsWatched" />
-    </FluentToolbar>
+        <FluentCard>
+            <FluentText As="TextTag.Paragraph">
+                Success: @geolocationResult?.IsSuccess
+                <br />
+                Position: @geolocationResult?.Position
+                <br />
+                Error: @geolocationResult?.Error
+            </FluentText>
+        </FluentCard>
 
-    <FluentCard>
-        <FluentLabel>Success: @geolocationResult?.IsSuccess</FluentLabel>
-        <FluentLabel>Position: @geolocationResult?.Position</FluentLabel>
-        <FluentLabel>Error: @geolocationResult?.Error</FluentLabel>
-    </FluentCard>
-</FluentLayout>
-
-<FluentOverlay @bind-Visible="@overlay"
-               Transparent="false">
-    <FluentProgressRing />
-</FluentOverlay>
+        <FluentOverlay @bind-Visible="@overlay" FullScreen="true">
+            <FluentSpinner />
+        </FluentOverlay>
+    </ChildContent>
+</DemoPage>
 
 @code {
     private const string key = "geoKey";
+    private const string title = "Geolocation";
     private GeolocationInterop? interop;
     private bool overlay;
     private bool disabled => overlay || interop == null;
@@ -49,8 +57,7 @@
         {
             interop = new(JSRuntime);
             await Task.CompletedTask;
-            //await interop.SetLogLevel(LogLevel.Debug);
-            //interop.OnGeolocationWatch += OnGeolocationWatch;
+            //await interop.SetLogLevel(LogLevel.Trace);
             interop.OnGeolocationWatchAsync += OnGeolocationWatchAsync;
             StateHasChanged();
         }
@@ -64,33 +71,33 @@
 
             overlay = true;
 
-            await UpdateGeolocationAsync(null);
+            await UpdateGeolocation(null);
             var geolocation = await interop.GetLocation(new PositionOptions { EnableHighAccuracy = true });
 
             if (geolocation != null)
             {
                 if (geolocation.IsSuccess)
                 {
-                    await UpdateGeolocationAsync(geolocation);
+                    await UpdateGeolocation(geolocation);
                 }
                 else
                 {
                     var errMsg = $"Geolocation service failed. {geolocation.Error?.Message}";
                     Logger?.LogError(errMsg);
-                    ToastService.ShowError(errMsg);
+                    await ToastService.ShowError(errMsg);
                 }
             }
             else
             {
                 var warnMsg = $"Geolocation service returned null.";
                 Logger?.LogWarning(warnMsg);
-                ToastService.ShowWarning(warnMsg);
+                await ToastService.ShowWarning(warnMsg);
             }
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, null);
-            ToastService.ShowError(ex.Message);
+            await ToastService.ShowError(ex.Message);
         }
         finally
         {
@@ -99,7 +106,7 @@
     }
 
 
-    private async Task GeolocationWatch(bool watch)
+    private async Task GeolocationWatchAsync(bool watch)
     {
         try
         {
@@ -109,10 +116,10 @@
 
             if (watch)
             {
-                await UpdateGeolocationAsync(null);
+                await UpdateGeolocation(null);
                 await interop.WatchPosition(key);
                 isWatching = true;
-                ToastService.ShowInfo($"Waiting for first Geolocation Watch event...");
+                await ToastService.ShowInfo($"Waiting for first Geolocation Watch event...");
             }
             else
             {
@@ -122,7 +129,7 @@
         catch (Exception ex)
         {
             Logger.LogError(ex, null);
-            ToastService.ShowError(ex.Message);
+            await ToastService.ShowError(ex.Message);
         }
     }
 
@@ -135,18 +142,18 @@
             {
                 await interop.ClearWatch(key);
                 isWatching = false;
-                await UpdateGeolocationAsync(null);
-                ToastService.ShowInfo($"Geolocation watch was removed.");
+                await UpdateGeolocation(null);
+                await ToastService.ShowInfo($"Geolocation watch was removed.");
             }
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, null);
-            ToastService.ShowError(ex.Message);
+            await ToastService.ShowError(ex.Message);
         }
     }
 
-    private void UpdateGeolocation(GeolocationResult? geolocation)
+    private async Task UpdateGeolocation(GeolocationResult? geolocation)
     {
         if (interop == null) return;
 
@@ -154,13 +161,7 @@
         StateHasChanged();
 
         if (geolocation is not null)
-            ToastService.ShowInfo($"Geolocation updated: {geolocation}");
-    }
-
-    private async Task UpdateGeolocationAsync(GeolocationResult? geolocation)
-    {
-        await Task.CompletedTask;
-        UpdateGeolocation(geolocation);
+            await ToastService.ShowInfo($"Geolocation updated: {geolocation}");
     }
 
     private async Task IsWatched()
@@ -168,33 +169,27 @@
         try
         {
             var watched = await interop!.IsWatched(key);
-            ToastService.ShowInfo($"Geolocation is being watched: {watched}");
+            await ToastService.ShowInfo($"Geolocation is being watched: {watched}");
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, null);
-            ToastService.ShowError(ex.Message);
-        }
-    }
-
-    private void OnGeolocationWatch(GeolocationEventArgs e)
-    {
-        try
-        {
-            ToastService.ShowInfo($"Geolocation Watch event received. Success:{e.IsSuccess}");
-            UpdateGeolocation(e.Result!);
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, null);
-            ToastService.ShowError(ex.Message);
+            await ToastService.ShowError(ex.Message);
         }
     }
 
     private async Task OnGeolocationWatchAsync(GeolocationEventArgs e)
     {
-        await Task.CompletedTask;
-        OnGeolocationWatch(e);
+        try
+        {
+            await ToastService.ShowInfo($"Geolocation Watch event received. Success:{e.IsSuccess}");
+            await UpdateGeolocation(e.Result!);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, null);
+            await ToastService.ShowError(ex.Message);
+        }
     }
 
     public async ValueTask DisposeAsync()

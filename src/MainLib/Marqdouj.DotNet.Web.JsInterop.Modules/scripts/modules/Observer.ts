@@ -1,7 +1,7 @@
 import { Logger, LogLevel } from "./Logger"
 
 export class Observer {
-    static #observer: ResizeObserver;
+    static #observer: ResizeObserver | undefined;
     static readonly #logger: Logger = new Logger();
 
     static setLogLevel(level: LogLevel) {
@@ -51,7 +51,7 @@ export class Observer {
             ids.forEach((id, index) => {
                 const elem = document.getElementById(id);
                 if (elem)
-                    Observer.#observer.observe(elem);
+                    Observer.#observer!.observe(elem);
                 else
                     Observer.#logger.logMessage(LogLevel.Warn, `Element where id = '${id}' does not exist and will not be observed.`);
             });
@@ -63,9 +63,9 @@ export class Observer {
             ids.forEach((id, index) => {
                 const elem = document.getElementById(id);
                 if (elem)
-                    Observer.#observer.unobserve(elem);
+                    Observer.#observer!.unobserve(elem);
                 else
-                    Observer.#logger.logMessage(LogLevel.Warn, `Element where id = '${id}' does not exist and will not be unobserved. `);
+                    this.#logger.logMessage(LogLevel.Warn, `Element where id = '${id}' does not exist and will not be unobserved. `);
             });
         }
     }
@@ -73,7 +73,7 @@ export class Observer {
     static disconnectResizers(){
         if (Observer.#observer) {
             Observer.#observer.disconnect();
-            Observer.#observer = null;
+            Observer.#observer = undefined;
             Observer.#logger.logMessage(LogLevel.Trace, "disconnectResizers was called.");
         }
     }
