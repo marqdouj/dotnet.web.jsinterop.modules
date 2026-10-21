@@ -5,30 +5,34 @@
 @inject IJSRuntime JSRuntime
 @inject ILogger<JsLoggerDemo> Logger
 
-<PageTitle>JSLogger</PageTitle>
-
-<FluentLayout>
-    <FluentHeader>JSLogger</FluentHeader>
-
-    <FluentCard>
-        <FluentLabel Typo="Typography.Subject">Logger Module</FluentLabel>
-        <FluentToolbar>
-            <FluentButton @onclick="(() => TestLogger())">Test All</FluentButton>
-            <FluentSpacer />
-            <FluentButton @onclick="(() => TestRaw())">Test Raw</FluentButton>
-            <FluentButton @onclick="(() => TestScope())">Test Scope</FluentButton>
-            <FluentSpacer />
-            <FluentButton @onclick="(() => TestLogger(LogLevel.Trace))">Trace</FluentButton>
-            <FluentButton @onclick="(() => TestLogger(LogLevel.Debug))">Debug</FluentButton>
-            <FluentButton @onclick="(() => TestLogger(LogLevel.Information))">Information</FluentButton>
-            <FluentButton @onclick="(() => TestLogger(LogLevel.Warning))">Warning</FluentButton>
-            <FluentButton @onclick="(() => TestLogger(LogLevel.Error))">Error</FluentButton>
-            <FluentButton @onclick="(() => TestLogger(LogLevel.Critical))">Critical</FluentButton>
-        </FluentToolbar>
-    </FluentCard>
-</FluentLayout>
+<DemoPage Title="@title">
+    <SummaryContent>
+        <FluentText As="TextTag.Paragraph">
+            This page demonstrates the JS Logger.
+        </FluentText>
+    </SummaryContent>
+    <ChildContent>
+        <FluentCard>
+            <FluentText>Logger Module</FluentText>
+            <Toolbar>
+                <FluentButton @onclick="(() => TestLogger())">Test All</FluentButton>
+                <FluentSpacer Width="8px" />
+                <FluentButton @onclick="(() => TestRaw())">Test Raw</FluentButton>
+                <FluentButton @onclick="(() => TestScope())">Test Scope</FluentButton>
+                <FluentSpacer Width="8px" />
+                <FluentButton @onclick="(() => TestLogger(LogLevel.Trace))">Trace</FluentButton>
+                <FluentButton @onclick="(() => TestLogger(LogLevel.Debug))">Debug</FluentButton>
+                <FluentButton @onclick="(() => TestLogger(LogLevel.Information))">Information</FluentButton>
+                <FluentButton @onclick="(() => TestLogger(LogLevel.Warning))">Warning</FluentButton>
+                <FluentButton @onclick="(() => TestLogger(LogLevel.Error))">Error</FluentButton>
+                <FluentButton @onclick="(() => TestLogger(LogLevel.Critical))">Critical</FluentButton>
+            </Toolbar>
+        </FluentCard>
+    </ChildContent>
+</DemoPage>
 
 @code {
+    private const string title = "JS Logger";
     private JSLoggerInterop? logger;
     private JSLoggerInterop LoggerService => logger!;
 

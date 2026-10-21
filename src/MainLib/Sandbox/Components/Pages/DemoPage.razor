@@ -1,0 +1,56 @@
+﻿<PageTitle>@Title</PageTitle>
+
+<FluentStack Height="100%" Orientation="Orientation.Vertical" VerticalGap="@verticalGap">
+    <DemoPageHeader>
+        @pageHeader
+        @if (hasSummary)
+        {
+            <FluentSpacer />
+            <FluentCheckbox Label="Summary" @bind-Value:get="@ShowSummary" @bind-Value:set="@OnShowSummaryChanged" />
+        }
+    </DemoPageHeader>
+
+    @if (hasSummary)
+    {
+        <FluentCard hidden="@hideSummary" Style="margin-bottom:3px;">
+            @SummaryContent
+        </FluentCard>
+    }
+
+    @ChildContent
+</FluentStack>
+
+@code {
+    private string pageHeader => string.IsNullOrWhiteSpace(Header) ? Title : Header;
+    private string showHideSummary => ShowSummary ? "Hide Summary" : "Show Summary";
+    private bool hideSummary => !ShowSummary;
+    private bool hasSummary => SummaryContent != null;
+    private string? verticalGap => VerticalGap ?? "3px";
+
+    [Parameter, EditorRequired]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? SummaryContent { get; set; }
+
+    [Parameter]
+    public bool ShowSummary { get; set; } = true;
+
+    [Parameter]
+    public EventCallback<bool> ShowSummaryChanged { get; set; }
+
+    private async Task OnShowSummaryChanged(bool value)
+    {
+        ShowSummary = value;
+        await ShowSummaryChanged.InvokeAsync(value);
+    }
+
+    [Parameter, EditorRequired]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string? Header { get; set; }
+
+    [Parameter]
+    public string? VerticalGap { get; set; }
+}
